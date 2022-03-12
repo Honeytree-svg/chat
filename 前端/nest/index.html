@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title></title>
+		<script src="js/mui.min.js"></script>
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<link rel="stylesheet" type="text/css" href="fonticon/iconfont.css" />
+		<link rel="stylesheet" type="text/css" href="css/header.css" />
+
+		<script type="text/javascript" charset="utf-8">
+			mui.init();
+			mui.plusReady(function() {
+				plus.navigator.setStatusBarStyle("dark");
+				plus.navigator.setStatusBarBackground("lightgreen");
+			});
+		</script>
+	</head>
+	<body>
+		<audio autoplay id="audio9" width="420" hidden="true" controls></audio>
+		<!-- 主界面菜单同时移动 -->
+		<!-- 侧滑导航根容器 -->
+		<div class="mui-off-canvas-wrap mui-draggable">
+			<!-- 主页面容器 -->
+			<div class="mui-inner-wrap">
+				<!-- 菜单容器 -->
+				<aside class="mui-off-canvas-left" id="offCanvasSide">
+					<div class="mui-scroll-wrapper">
+						<div class="mui-scroll">
+							<!-- 菜单具体展示内容 -->
+							<!--  功能列表-->
+							<ul class="mui-table-view">
+								<li class="mui-table-view-cell" id="create_room">
+									<a class="mui-navigate-right">
+										创建房间
+									</a>
+								</li>
+							</ul>
+							<ul class="mui-table-view">
+								<li class="mui-table-view-cell mui-collapse">
+									<a class="mui-navigate-right" href="#">房间管理</a>
+									<div class="mui-collapse-content">
+										<ul class="mui-table-view">
+											<li class="mui-table-view-cell" id="updateRoomInfo">
+												<a class="mui-navigate-right">
+													修改房间信息
+												</a>
+											</li>
+											<li class="mui-table-view-cell" id="deleteRoom">
+												<a class="mui-navigate-right">
+													删除房间
+												</a>
+											</li>
+										</ul>
+									</div>
+								</li>
+
+								<!-- 								<li class="mui-table-view-cell mui-collapse">
+									<a class="mui-navigate-right" href="#">面板3</a>
+									<div class="mui-collapse-content">
+										<p>面板3子内容</p>
+									</div>
+								</li> -->
+							</ul>
+							<ul class="mui-table-view">
+								<li class="mui-table-view-cell mui-collapse" id="showRoomUser">
+									<a class="mui-navigate-right" href="#">房间在线用户</a>
+									<div class="mui-collapse-content">
+										<ul class="mui-table-view" id="userList">
+											<li class="mui-table-view-cell mui-media">
+												<a href="javascript:;">
+													<img class="mui-media-object mui-pull-left" src="">
+													<div class="mui-media-body">
+														幸福
+														<p class="mui-ellipsis">能和心爱的人一起睡觉，是件幸福的事情；可是，打呼噜怎么办？</p>
+													</div>
+												</a>
+											</li>
+											<li class="mui-table-view-cell mui-media">
+												<a href="javascript:;">
+													<img class="mui-media-object mui-pull-left" src="">
+													<div class="mui-media-body">
+														木屋
+														<p class="mui-ellipsis">想要这样一间小木屋，夏天挫冰吃瓜，冬天围炉取暖.</p>
+													</div>
+												</a>
+											</li>
+										</ul>
+									</div>
+								</li>
+
+								<!-- <li class="mui-table-view-cell mui-collapse">
+									<a class="mui-navigate-right" href="#">面板3</a>
+									<div class="mui-collapse-content">
+										<p>面板3子内容</p>
+									</div>
+								</li> -->
+							</ul>
+
+
+						</div>
+					</div>
+				</aside>
+				<!-- 主页面标题 -->
+				<header class="mui-bar mui-bar-nav title">
+					<a class="mui-icon mui-action-menu mui-icon-bars mui-pull-left" href="#offCanvasSide"></a>
+					<h1 class="mui-title title-color"><b>Nest</b></h1>
+				</header>
+				<nav class="mui-bar mui-bar-tab">
+					<a class="mui-tab-item mui-active" tabindex="0" id="room-chat">
+						<span class="mui-icon iconfont icon-niaochao11"></span>
+						<span class="mui-tab-label">消息</span>
+					</a>
+					<a class="mui-tab-item " tabindex="1">
+						<span class="mui-icon iconfont icon-contact"></span>
+						<span class="mui-tab-label">房间</span>
+					</a>
+					<a class="mui-tab-item" tabindex="2">
+						<span class="mui-icon iconfont icon-zhinanzhen"></span>
+						<span class="mui-tab-label">私聊</span>
+					</a>
+					<a class="mui-tab-item" tabindex="3">
+						<span class="mui-icon mui-icon-person"></span>
+						<span class="mui-tab-label">我</span>
+					</a>
+				</nav>
+
+				<!-- 主页面内容容器 -->
+				<div class="mui-content mui-scroll-wrapper">
+					<div class="mui-scroll">
+						<!-- 主界面具体展示内容 -->
+
+
+					</div>
+				</div>
+				<div class="mui-off-canvas-backdrop"></div>
+			</div>
+		</div>
+		<script src="js/app.js"></script>
+		<script type="text/javascript">
+			var myAudio = document.getElementById('audio9');
+			var myArray = new Array();
+			var AddSongAndPlay = function(url) {
+				myArray.push(url);
+				console.log("myArray:" + myArray);
+				if (myAudio.paused) {
+					console.log("歌曲暂停播放中");	
+					myAudio.src = myArray[0];
+					myAudio.play();
+					//myAudio.currentTime = 60;
+					//myAudio.close();
+				} else {
+					console.log("歌曲播放中");
+					myAudio.play();
+				}
+			};
+			
+			myAudio.addEventListener("ended", function() {
+				myArray.shift();
+				console.log("歌曲播放结束");
+				myAudio.src = myArray[0];
+				myAudio.play();
+			}, false);
+			
+			myAudio.addEventListener("play", function() {
+				console.log("歌曲开始播放");
+			}, false);
+			
+			myAudio.addEventListener("pause", function() {
+				console.log("歌曲暂停播放");
+				myAudio.play();
+			}, false);
+			
+
+			var cutSong = function() {
+				myArray.shift();
+				console.log(myArray);
+				myAudio.src = myArray[0];
+				myAudio.play();
+			};
+
+			var clearSong = function() {
+				myArray = [];
+				console.log("myArray:" + myArray);
+				myAudio.src = "";
+				myAudio.play();
+			};
+
+			var nestArray = [{
+					pageId: "nest-index.html",
+					pageUrl: "nest-index.html"
+				},{
+					pageId: "nest-room.html",
+					pageUrl: "nest-room.html"
+				},{
+					pageId: "nest-chatlist.html",
+					pageUrl: "nest-chatlist.html"
+				},{
+					pageId: "nest-me.html",
+					pageUrl: "nest-me.html"
+				}
+			];
+
+			//当前界面
+			var currentView = 0;
+
+			//子页面样式
+			var nestStyle = {
+				top: "44px",
+				bottom: "50px"
+			}
+
+
+			mui.plusReady(function() {
+				
+
+				// 禁止返回到登录注册页面
+				mui.back = function() {
+					return false;
+				}
+				
+				
+
+
+				//获取当前的webview对象
+				var indexWebview = plus.webview.currentWebview();
+
+				//向当前的主页webview追加子页的4张webview对象
+				for (var i = 0; i < nestArray.length; i++) {
+					var nestPage = plus.webview.create(nestArray[i].pageUrl, nestArray[i].pageId, nestStyle);
+					//隐藏webview窗口
+					nestPage.hide();
+					//追加每一个子页面到当前主页面
+					indexWebview.append(nestPage);
+				}
+				plus.webview.show("nest-index.html");
+
+				//批量绑定tab事件，展示不同的页面
+				mui(".mui-bar-tab").on("tap", "a", function() {
+					var tabindex = this.getAttribute("tabindex");
+					currentView = tabindex;
+
+
+					// 触发另外一个webview的自定义事件，可以使用 mui.fire()
+					var Webview = plus.webview.getWebviewById(nestArray[tabindex].pageId);
+					mui.fire(Webview, "refresh");
+					
+					//console.log(nestArray[currentView].pageId);
+					//显示点击的tab选项所对应的界面
+					plus.webview.show(nestArray[tabindex].pageId, "fade-in", 200);
+
+					//隐藏其他的不需要的界面
+					for (var i = 0; i < nestArray.length; i++) {
+						if (i != tabindex) {
+							plus.webview.hide(nestArray[i].pageId, "fade-out", 200);
+						}
+					}
+
+					
+				});
+
+
+
+				//导航栏开启或消失时其他webview界面的响应
+				document.querySelector('.mui-off-canvas-wrap').addEventListener('shown', function(event) {
+
+					console.log(plus.webview.currentWebview().getURL());
+
+					plus.webview.hide(nestArray[currentView].pageId, "fade-out", 0);
+
+
+					//此时需要通过ajax请求数据库获得roomlist
+					//获取房间列表
+					//getRoomListFromDatabase();
+
+
+					console.log("滑动开启");
+				});
+
+				document.querySelector('.mui-off-canvas-wrap').addEventListener('hidden', function(event) {
+					//...
+					//plus.webview.show(nestArray[currentView].pageId, "fade-out", 200);
+					plus.webview.show(nestArray[currentView].pageId, "fade-in", 200);
+					console.log("滑动关闭");
+				});
+
+
+
+
+				// 绑定创建房间
+				var create_room = document.getElementById("create_room");
+				create_room.addEventListener("tap", function() {
+					var myRoom = app.getMyRoom();
+					if (myRoom == null) {
+						mui.openWindow({
+							url: "plugin/v3.1.6/create_room.html",
+							id: "create_room.html",
+						});
+					} else {
+						app.showToast("你已经有一间房子了", "error");
+					}
+
+				});
+
+				// 绑定修改房间信息
+				var updateRoomInfo = document.getElementById("updateRoomInfo");
+				updateRoomInfo.addEventListener("tap", function() {
+					var myRoom = app.getMyRoom();
+					if(myRoom == null){
+						app.showToast("你还没有房子","error");
+					}else{
+						mui.openWindow({
+							url: "plugin/v3.1.6/update-room.html",
+							id: "update-room.html",
+						});
+					}
+
+				});
+
+				// 绑定删除房间
+				var deleteRoom = document.getElementById("deleteRoom");
+				deleteRoom.addEventListener("tap", function() {
+					var myRoom = app.getMyRoom();
+
+					if (myRoom == null) {
+						app.showToast("你连房子都没有", "error");
+					} else {
+						if (confirm('请确认是否立即生效')) {
+							plus.nativeUI.showWaiting("请稍后...");
+							mui.ajax(app.serverUrl + "/r/deleteRoom?roomId=" + myRoom.roomId, {
+								data: {},
+								dataType: 'json', //服务器返回json格式数据
+								type: 'post', //HTTP请求类型
+								timeout: 10000, //超时时间设置为10秒；
+								headers: {
+									'Content-Type': 'application/json'
+								},
+								success: function(data) {
+									//服务器返回响应
+									plus.nativeUI.closeWaiting();
+
+									if (data.status == 200) {
+
+										app.removeMyRoom();
+
+									} else {
+										app.showToast(data.msg, "error");
+									}
+								}
+							});
+						}
+					}
+				});
+				
+				// 显示房间用户列表
+				var showRoomUser = document.getElementById("showRoomUser");
+				showRoomUser.addEventListener("tap",function(){
+					// 渲染工作
+					var userRoomList = app.getRoomUserList();
+					//  构建通讯录html进行渲染
+					
+					var userListHtml = '';
+					for (var i = 0 ; i < userRoomList.length ; i ++ ) {
+						var user = userRoomList[i];
+							userListHtml += '' +
+										'<li friendUserId="' + user.id + '" friendUsername="' + user.username +'" friendNickname="' + user.nickname + '" friendFaceImage="' + app.imgServerUrl + user.faceImage + '" class="chat-with-friend mui-media mui-table-view-cell mui-indexed-list-item" style="padding: 8px 10px;">' +
+											'<img class="mui-media-object mui-pull-left" style="max-width: 35px;height: 35px;" src="' + app.imgServerUrl + user.faceImage + '"/>' +
+											'<div class="mui-media-body" style="line-height: 35px;">' + user.nickname + '</div>' +
+										'</li>';
+					}
+					
+					// 渲染html
+					document.getElementById("userList").innerHTML = userListHtml;
+					
+					// 为房间绑定点击事件
+					mui("#userList").on("tap", ".chat-with-friend", function(e){
+						var friendUserId = this.getAttribute("friendUserId");
+						var friendNickname = this.getAttribute("friendNickname");
+						var friendFaceImage = this.getAttribute("friendFaceImage");
+						var friendUsername = this.getAttribute("friendUsername");
+						
+						var me = app.getUserGlobalInfo();
+						if(me.id == friendUserId){
+							// 打开详细资料页面
+							mui.openWindow({
+								url: "character_detail.html",
+								id: "character_detail.html",
+								extras: {
+									character : {"id": me.id,
+									"username" : me.username,
+									"nickname": me.nickname,
+									"faceImage": me.faceImage}
+								}
+							});
+						}else {
+							// 打开聊天子页面
+							mui.openWindow({
+								url: "mySubscriberOnlyOne.html",
+								id: "mySubscriberOnlyOne.html",	
+								extras: {						
+									mySubscribe: {"friendUserId":friendUserId,"friendUsername":friendUsername,"friendNickname":friendNickname,"friendFaceImage":friendFaceImage}
+								}
+							});
+						}
+						
+							
+						
+					});
+				})
+
+
+				// 添加自定义事件，显示nest-index界面
+				window.addEventListener("showIndex", function() {
+					var btn = document.getElementById("room-chat");
+					mui.trigger(btn, 'tap');
+				});
+
+				// 删除歌单
+				window.addEventListener("clearSong", function() {
+					clearSong();
+				});
+				
+				// 放歌
+				window.addEventListener("playSong", function(e) {
+					var url = e.detail.url;
+					AddSongAndPlay(url);
+				});
+			});
+
+
+
+
+
+			//侧滑导航内容滚动设置，不然导航栏中的内容无法滚动
+			mui('.mui-scroll-wrapper').scroll({
+				deceleration: 0.0005 //flick 减速系数，系数越大，滚动速度越慢，滚动距离越小，默认值0.0006
+			});
+		</script>
+
+	</body>
+</html>

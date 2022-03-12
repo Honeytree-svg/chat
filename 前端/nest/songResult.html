@@ -1,0 +1,141 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<script src="js/mui.js"></script>
+		<link href="css/mui.css" rel="stylesheet" />
+		<link rel="stylesheet" type="text/css" href="css/header.css" />
+
+		<style>
+			#btn_add_friend {
+	        	background-color: #1aad19;
+	        }
+	        #btn_add_friend:active {
+	            background-color: #128e12;
+	        }
+		</style>
+	</head>
+
+	<body>
+
+		<header class="mui-bar mui-bar-nav title" style="position: fixed;">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left title-color"></a>
+			<h1 class="mui-title title-color"><b id="chatting-nickname">搜索结果</b></h1>
+		</header>
+
+		<div class="mui-content">
+			<ul class="mui-table-view" id="songList">
+
+<!-- 				<li class="mui-table-view-cell mui-media">
+					<a href="javascript:;">
+						<img class="mui-media-object mui-pull-left" src="http://p1.music.126.net/6y-UleORITEDbvrOLV0Q8A==/5639395138885805.jpg">
+						<div class="mui-media-body">
+							夜に駆ける
+							<p class="mui-ellipsis">YOASOBI</p>
+						</div>
+						<div id="" class="mui-pull-right">
+							<button id="play_song" type="button" class="mui-btn mui-btn-green" style="color: white;width: 90%;display: inline;padding: 12px 0">点播</button>
+						</div>
+					</a>
+				</li> -->
+
+			</ul>
+
+		</div>
+
+		<script type="application/javascript" src="js/app.js"></script>
+		<script type="text/javascript">
+			mui.init();
+
+			mui.plusReady(function() {
+
+				var meInfo = app.getUserGlobalInfo();
+				var song = null;
+
+				// 获取上一个页面传入的对象，并且对本页面响应的dom赋值初始化
+				var currnetWebview = plus.webview.currentWebview();
+				var songResult = currnetWebview.songResult;
+				console.log(songResult);
+				// 构建歌单html进行渲染
+				var songsHtml = '';
+				for (var i = 0 ; i < songResult.length ; i ++ ) {
+					var temp = songResult[i];
+					songsHtml +='' +
+								'<li class="mui-table-view-cell mui-media">' +
+									'<a href="javascript:;">' +
+										'<img class="mui-media-object mui-pull-left" src="' + temp.artists[0].img1v1Url + '">' +
+										'<div class="mui-media-body">' + 
+											temp.name +
+											'<p class="mui-ellipsis">' + temp.artists[0].name + '</p>' +
+										'</div>'+
+										'<div class="mui-pull-right">' +
+											'<button type="button" songId=' + temp.id + ' songName=' + temp.name + ' singer=' + temp.artists[0].name + ' cover=' + temp.artists[0].img1v1Url + ' duration=' + temp.duration +  ' class="song-send mui-btn mui-btn-green" style="color: white;width: 90%;display: inline;padding: 12px 0">点播</button>' +
+										'</div>' +
+									'</a>' +
+								'</li>';
+				}
+				
+				// 渲染html
+				document.getElementById("songList").innerHTML = songsHtml;
+				
+				// 为歌单批量绑定点击事件
+				mui("#songList").on("tap", ".song-send", function(e){
+					var songId = this.getAttribute("songId");
+					var songName = this.getAttribute("songName");
+					var singer = this.getAttribute("singer");
+					var cover = this.getAttribute("cover");
+					var duration = this.getAttribute("duration");
+					var currentRoom = app.getCurrentRoom();
+					
+					var tempSong = new app.Song(meInfo.id, currentRoom.roomId, songId, null, songName, singer, cover, duration);
+					console.log(JSON.stringify(tempSong));
+				
+					app.setSongGlobalInfo(tempSong);
+							
+					// var songInfo = app.getSongGlobalInfo();
+					// console.log(JSON.stringify(songInfo));
+					
+					//通知这个页面，使用ajax异步请求，并返回选中歌曲的url
+					var uniqueChatting = plus.webview.getWebviewById("nest-index.html");
+					mui.fire(uniqueChatting, "sendSong");
+					console.log("dsadsaasda");
+					mui.back();
+					
+					
+					// mui(".mui-table-view").on('tap','.mui-table-view-cell',function(){
+					//   //获取id
+					//   var id = this.getAttribute("id");
+					//   //传值给详情页面，通知加载新数据
+					//   mui.fire(detail,'getDetail',{id:id});
+					//   //打开新闻详情
+					//   mui.openWindow({
+					//     id:'detail',
+					//     url:'detail.html'
+					//   });
+					// })
+					
+					
+					
+				// 	// 构建ChatMsg
+				// 	var chatMsg = new app.ChatMsg(me.id, friendUserId, msg_text_val, null);
+				// 	// 构建Song
+				// 	song = new app.Song(me.id, null, msg_text_val, null);
+				// 	// 构建DataContent
+				// 	var dataContent = new app.DataContent(app.SONG, chatMsg, song, null);
+					
+				// 	// 调用websocket 发送消息到netty后端
+				// 	var wsWebview = plus.webview.getWebviewById("nest-chatlist.html");
+				// 	wsWebview.evalJS("CHAT.chat('" + JSON.stringify(dataContent) + "')");
+					
+				
+					
+				});
+				
+			});
+		</script>
+	</body>
+
+</html>

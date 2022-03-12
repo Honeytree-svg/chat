@@ -1,0 +1,12 @@
+.title{
+	background-color: lightgreen;
+}
+
+.title-color{
+	color: white;
+}
+
+.mui-bar-tab .mui-tab-item.mui-active{
+	color: lightgreen;
+}
+//解决点击tab导致的Unable to preventDefault inside passive event listener问题

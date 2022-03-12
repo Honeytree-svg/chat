@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sz.mapper.RoomMapper" >
+  <resultMap id="BaseResultMap" type="com.sz.pojo.Room" >
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="room_id" property="roomId" jdbcType="VARCHAR" />
+    <result column="founder_id" property="founderId" jdbcType="VARCHAR" />
+    <result column="room_name" property="roomName" jdbcType="VARCHAR" />
+    <result column="room_image" property="roomImage" jdbcType="VARCHAR" />
+    <result column="room_image_big" property="roomImageBig" jdbcType="VARCHAR" />
+  </resultMap>
+</mapper>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sz.mapper.RoomMapperCustom" >
+
+	<select id="selectOnlyOneByRoomId" resultType="com.sz.pojo.Room"
+			parameterType="String">
+		
+		select 
+			*
+		from
+			 room
+		where 
+			room_Id = #{roomId}
+	</select>
+
+	<select id="selectOnlyOneByFounderId" resultType="com.sz.pojo.Room"
+			parameterType="String">
+
+		select
+			*
+		from
+			 room
+		where
+			founder_id = #{founderId}
+	</select>
+
+
+	<!-- 房间列表 -->
+	<select id="queryRoom" resultType="com.sz.pojo.Room"
+			parameterType="String">
+		select
+			*
+		from
+			room
+
+	</select>
+
+	<!-- 房间列表 -->
+	<update id="updateRoom" parameterType="com.sz.pojo.Room">
+		update room
+		<set>
+			<if test="founderId!=null">
+				founder_id=#{founderId},
+			</if>
+			<if test="roomName!=null">
+				room_name=#{roomName},
+			</if>
+			<if test="roomImage!=null">
+				room_image=#{roomImage},
+			</if>
+			<if test="roomImageBig!=null">
+				room_image_big=#{roomImageBig},
+			</if>
+		</set>
+		where room_id=#{roomId}
+
+	</update>
+
+	<!-- 查询房间内最近10条信息 -->
+	<select id="LastMsgInThisRoom" resultType="com.sz.pojo.ChatMsg" parameterType="String">
+		select * from chat_msg where accept_user_id = #{receivedId} ORDER BY create_time DESC LIMIT 10
+	</select>
+
+
+
+</mapper>

@@ -1,0 +1,199 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<script src="js/mui.js"></script>
+		<link href="css/mui.css" rel="stylesheet" />
+		<link rel="stylesheet" type="text/css" href="css/header.css" />
+
+		<style>
+			#btn_add_friend {
+	        	background-color: #1aad19;
+	        }
+	        #btn_add_friend:active {
+	            background-color: #128e12;
+	        }
+		</style>
+	</head>
+
+	<body >
+
+		<header class="mui-bar mui-bar-nav title" style="position: fixed;">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left title-color"></a>
+			<h1 class="mui-title title-color"><b id="chatting-nickname">详细资料</b></h1>
+		</header>
+		
+		<div class="mui-content">
+			
+			<ul class="mui-table-view">
+			    <li class="mui-table-view-cell mui-media" style="padding-top: 10px;">
+			        <a href="javascript:;">
+			            <img id="img_friend_face" class="mui-media-object mui-pull-left" src="" 
+			            	style="border-radius: 8%;line-height: 50px;max-width: 50px;height: 50px;">
+			            <div class="mui-media-body">
+			               	<label id="lab_friend_nickname"></label>
+			                <p id="p_friend_username" class="mui-ellipsis"></p>
+			            </div>
+			        </a>
+			    </li>
+			</ul>
+			
+			<br />
+			<div style="text-align: center;" id="bottonList">
+				<button id="btn_send_message" type="button" class="mui-btn mui-btn-block mui-btn-green" 
+					style="color: white;width: 90%;display: inline;padding: 12px 0">发送消息</button>
+				<br />
+				<button id="btn_subscribe" type="button" class="mui-btn mui-btn-block mui-btn-green"
+					style="color: white;width: 90%;display: inline;padding: 12px 0">关注</button>
+				<br />
+				<button id="btn_cancel_subscribe" type="button" class="mui-btn mui-btn-block mui-btn-red"
+					style="color: white;width: 90%;display: inline;padding: 12px 0">取消关注</button>
+				<br />
+				<button id="btn_back" type="button" class="mui-btn mui-btn-block" 
+					style="width: 90%;display: inline;padding: 12px 0">返回</button>
+			</div>
+			
+		</div>
+		
+		<script type="application/javascript" src="js/app.js"></script>
+		<script type="text/javascript">
+			mui.init();
+			
+			mui.plusReady(function(){
+				
+				var meInfo = app.getUserGlobalInfo();
+				
+				// 获取上一个页面传入的对象，并且对本页面响应的dom赋值初始化
+				var currnetWebview = plus.webview.currentWebview();
+				var mySubscribe = currnetWebview.mySubscribe;
+//				console.log(JSON.stringify(mySubscribe));
+				
+				var img_friend_face = document.getElementById("img_friend_face");
+				var lab_friend_nickname = document.getElementById("lab_friend_nickname");
+				var p_friend_username = document.getElementById("p_friend_username");
+				
+				
+				// 判断按钮是否需要隐藏
+				var user = app.getSubscribeFromSubscribeList(mySubscribe.friendUserId);
+				var html = "";
+				html += '<button id="btn_send_message" type="button" class="mui-btn mui-btn-block mui-btn-green" ' +
+				' 	style="color: white;width: 90%;display: inline;padding: 12px 0">发送消息</button>'+
+				'<br />';
+				if(user == null){
+					html+='<button id="btn_subscribe" type="button" class="mui-btn mui-btn-block mui-btn-green" '+
+					' style="color: white;width: 90%;display: inline;padding: 12px 0">关注</button>'+
+				'<br />';
+				}else {
+					html +='<button id="btn_cancel_subscribe" type="button" class="mui-btn mui-btn-block mui-btn-red" '+
+					' style="color: white;width: 90%;display: inline;padding: 12px 0">取消关注</button>'+
+				'<br />';
+				}
+				html+='<button id="btn_back" type="button" class="mui-btn mui-btn-block" '+
+					' style="width: 90%;display: inline;padding: 12px 0">返回</button>';
+				
+				var divlist = document.getElementById("bottonList");
+				divlist.innerHTML = html;
+				
+				img_friend_face.src = app.imgServerUrl + mySubscribe.friendFaceImage;
+				lab_friend_nickname.innerHTML = mySubscribe.friendNickname;
+				p_friend_username.innerHTML = "账号：" + mySubscribe.friendUsername;
+				
+				// 发送消息
+				var btn_send_message = document.getElementById("btn_send_message");
+				btn_send_message.addEventListener("tap",function(){
+					
+					// 打开聊天子页面
+					mui.openWindow({
+						url: "chatting.html",
+						id: "chatting-" + mySubscribe.friendUserId,	// 每个朋友的聊天页面都是唯一对应的
+						extras: {
+							friendUserId: mySubscribe.friendUserId,
+							friendNickname: mySubscribe.friendNickname,
+							friendFaceImage: mySubscribe.friendFaceImage,
+							friendUsername : mySubscribe.friendUsername
+						}
+					});
+				});
+				
+				// 关注按钮
+				var btn_subscribe = document.getElementById("btn_subscribe");
+				btn_subscribe.addEventListener("tap", function() {
+	
+					plus.nativeUI.showWaiting("请稍后...");
+					mui.ajax(app.serverUrl + "/u/addFriendRequest?myUserId=" + meInfo.id +
+									"&friendUsername=" + mySubscribe.friendUsername, {
+						data:{},
+						dataType:'json',//服务器返回json格式数据
+						type:'post',//HTTP请求类型
+						timeout:10000,//超时时间设置为10秒；
+						headers:{'Content-Type':'application/json'},	              
+						success:function(data){
+							//服务器返回响应
+							plus.nativeUI.closeWaiting();
+							
+							if (data.status == 200) {
+								
+								app.showToast("关注成功", "success");
+								// 关注列表
+								var mySubscribeList = data.data;
+								app.setSubscribeList(mySubscribeList);
+								mui.openWindow({
+									url: "index.html",
+									id: "index.html"
+								});		
+							} else {
+								app.showToast(data.msg, "error");
+							}
+						}
+					});
+				});
+				
+				// 取消关注
+				var btn_cancel_subscribe = document.getElementById("btn_cancel_subscribe");
+				btn_cancel_subscribe.addEventListener("tap", function() {
+	
+					plus.nativeUI.showWaiting("请稍后...");
+					mui.ajax(app.serverUrl + "/u/cancelSubscribe?myUserId=" + meInfo.id +
+									"&friendUserId=" + mySubscribe.friendUserId, {
+						data:{},
+						dataType:'json',//服务器返回json格式数据
+						type:'post',//HTTP请求类型
+						timeout:10000,//超时时间设置为10秒；
+						headers:{'Content-Type':'application/json'},	              
+						success:function(data){
+							//服务器返回响应
+							plus.nativeUI.closeWaiting();
+							
+							if (data.status == 200) {
+								
+								app.showToast("取消关注成功", "success");
+								// 粉丝列表
+								var mySubscribeList = data.data;
+								app.setSubscribeList(mySubscribeList);
+								
+								mui.openWindow({
+									url: "index.html",
+									id: "index.html"
+								});
+								
+							} else {
+								app.showToast(data.msg, "error");
+							}
+						}
+					});
+				});
+				
+				
+				// 绑定返回的函数
+				var btn_back = document.getElementById("btn_back");
+				btn_back.addEventListener("tap", function() {
+					mui.back();
+				});
+			});
+		</script>
+	</body>
+
+</html>

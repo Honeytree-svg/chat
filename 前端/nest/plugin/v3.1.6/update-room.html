@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="x-ua-compatible" content="ie=edge">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title>Cropper</title>
+		<script src="../../js/mui.min.js"></script>
+		<link href="../../css/mui.min.css" rel="stylesheet" />
+		<link href="../../css/header.css" rel="stylesheet" />
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+		<link rel="stylesheet" href="css/cropper.css">
+		<link rel="stylesheet" href="css/main.css">
+
+		<style>
+
+			#container {
+				position: absolute;
+				top: 44px;
+				background: #000000;
+			}
+			
+		</style>
+	</head>
+
+	<body>
+
+		<header class="mui-bar mui-bar-nav title" style="position: fixed;">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left" style="color: white;"></a>
+			<h1 class="mui-title title-color"><b id="chatting-nickname">一人至多一房</b></h1>
+		</header>
+
+		<div class="mui-content">
+
+			<ul class="mui-table-view">
+				<li class="mui-table-view-cell mui-media" style="padding-top: 10px;">
+					<a href="javascript:;">
+						<div class="img-container">
+							<img id="image" src="" style="background-color: #000000;">
+						</div>
+
+						<div class="wrap-input100 validate-input m-t-85 m-b-35">
+							<input class="input100" type="text" id="roomname" name="roomname" placeholder="房间名">
+							<span class="focus-input100"></span>
+						</div>
+
+					</a>
+				</li>
+			</ul>
+
+			<br />
+			<div style="text-align: center;">
+				<button id="upPic" type="button" class="mui-btn mui-btn-block mui-btn-green" style="color: white;width: 90%;display: inline;padding: 12px 0">修改图片</button>
+
+				<button id="createroom" type="button" class="mui-btn mui-btn-block mui-btn-green" style="color: white;width: 90%;display: inline;padding: 12px 0">确认更新</button>
+			</div>
+
+		</div>
+
+
+
+		<!-- Scripts -->
+		<script src="js/jquery-3.3.1.slim.min.js"></script>
+		<script src="js/bootstrap.bundle.min.js"></script>
+		<script src="js/common.js"></script>
+		<script src="js/cropper.js"></script>
+		<script src="../../js/app.js"></script>
+
+		<script type="text/javascript">
+			mui.init();
+
+			var $image = $('#image');
+			mui.plusReady(function() {
+
+				var user = app.getUserGlobalInfo();
+				var room = app.getMyRoom();
+				var roomName = document.getElementById("roomname");
+				roomName.value = room.roomName;
+				var roomPic = document.getElementById("image");
+				roomPic.setAttribute("src", app.imgServerUrl + room.roomImageBig);
+
+
+
+
+				window.addEventListener("updatePic", function(e) {
+					var image = document.getElementById("image");
+					var temproom = e.detail.room;
+					console.log(JSON.stringify(temproom));
+					image.setAttribute("src", app.imgServerUrl + temproom.roomImageBig);
+					room.roomImage = temproom.roomImage;
+					room.roomImageBig = temproom.roomImageBig;
+					console.log(JSON.stringify(room));
+				}, false);
+
+				// 上传图片界面
+				var upPic = document.getElementById("upPic");
+				upPic.addEventListener("tap", function() {
+
+					mui.openWindow({
+						url: "roomface-uploader2.html",
+						id: "roomface-uploader2.html",
+					});
+
+				});
+
+				//更新房间
+				var createroom = document.getElementById("createroom");
+				createroom.addEventListener("tap", function() {
+					
+
+					console.log(JSON.stringify(room));
+
+					plus.nativeUI.showWaiting("请稍后...");
+					mui.ajax(app.serverUrl + "/r/updateRoom", {
+						data: {
+							roomId: room.roomId,
+							founderId: user.id,
+							roomName: roomName.value,
+							roomImage: room.roomImage,
+							roomImageBig: room.roomImageBig,
+						},
+						dataType: 'json', //服务器返回json格式数据
+						type: 'post', //HTTP请求类型
+						timeout: 10000, //超时时间设置为10秒；
+						headers: {
+							'Content-Type': 'application/json'
+						},
+						success: function(data) {
+							//服务器返回响应
+							plus.nativeUI.closeWaiting();
+
+							if (data.status == 200) {
+
+								app.showToast("更新成功", "success");
+								// 粉丝列表
+								var myRoom = data.data;
+								app.setMyRoom(myRoom);
+
+								console.log(JSON.stringify(myRoom));
+
+								mui.openWindow({
+									url: "index.html",
+									id: "index.html"
+								});
+
+							} else {
+								app.showToast(data.msg, "error");
+							}
+						}
+					});
+				});
+
+
+
+			});
+		</script>
+
+	</body>
+
+</html>

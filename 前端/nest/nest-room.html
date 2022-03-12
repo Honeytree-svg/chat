@@ -1,0 +1,137 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="css/mui.css" rel="stylesheet" />
+	</head>
+
+	<body>
+		
+		<div class="mui-content">
+			<!--  房间列表-->
+			<ul class="mui-table-view" id="roomList">
+				<li class="enter-room mui-table-view-cell mui-media">
+					<a href="javascript:;">
+						<img class="mui-media-object mui-pull-left" src="">
+						<div class="mui-media-body">
+						    大厅
+							<p class="mui-ellipsis">名不见经传的地方.</p>
+						</div>
+					</a>
+				</li>
+			</ul>
+			
+		</div>
+		
+		<script src="js/mui.js"></script>
+		<script src="js/app.js"></script>
+		<script type="text/javascript">
+			mui.init()
+			
+			mui.plusReady(function(){
+				
+				// 刷新列表
+				window.addEventListener("refresh", function(){
+					getRoomListFromDatabase();
+				});
+				
+				// 从数据库获得房间列表
+				var getRoomListFromDatabase = function(){
+					mui.ajax(app.serverUrl + "/r/getRoomList",{
+						data:{},
+						dataType:'json',//服务器返回json格式数据
+						type:'post',//HTTP请求类型
+						timeout:10000,//超时时间设置为10秒；
+						headers:{'Content-Type':'application/json'},	              
+						success:function(data){
+							//服务器返回响应，根据响应结果，分析是否登录成功；
+							console.log(JSON.stringify(data));
+							
+							
+							if (data.status == 200) {
+								// 登录或者注册成功之后，保存全局用户对象到本地缓存
+								var roomList = data.data;
+								app.setRoomList(roomList);
+								
+								// 渲染roomList
+								appendRoomList(roomList);
+								
+							} else {
+								app.showToast(data.msg, "error");
+							}
+						}
+					});	 
+				}
+				
+				// 渲染roomList
+				function appendRoomList(roomList){
+					
+					//  构建通讯录html进行渲染
+					var roomListHtml = '';
+					for (var i = 0 ; i < roomList.length ; i ++ ) {
+						var room = roomList[i];
+							roomListHtml += ' ' +
+							'<li class="enter-room mui-table-view-cell mui-media" roomId="'+ room.roomId +'" >' +
+								'<a href="javascript:;">' +
+									'<img class="mui-media-object mui-pull-left" src="' + app.imgServerUrl + room.roomImage +'">' +
+									'<div class="mui-media-body">' +
+									    room.roomName +
+										'<p class="mui-ellipsis">名不见经传的地方.</p>' +
+									'</div>'+
+								'</a>'+
+							'</li>';
+					}
+					
+					// 渲染html
+					document.getElementById("roomList").innerHTML = roomListHtml;
+					
+					// 为房间绑定点击事件
+					mui("#roomList").on("tap", ".enter-room", function(e){
+						var meInfo = app.getUserGlobalInfo();
+						var roomId = this.getAttribute("roomId");
+						var preRoom = app.getCurrentRoom();
+						var nestRoom = plus.webview.getWebviewById("nest-index.html");
+						
+						// 更新currentRoom信息
+						//app.setCurrentRoom(currentRoom);
+						//console.log(JSON.stringify(currentRoom));
+				
+						// 通过mui.fire，刷新nest-index.html的信息
+						if(roomId != preRoom.roomId){
+							var nestchatlist = plus.webview.getWebviewById("nest-chatlist.html");
+							
+							// 如果点击的roomId不等于现在的roomId，则就是切换房间操作
+							// 1 退出当前房间
+							var chatMsg = new app.ChatMsg(meInfo.id, preRoom.roomId , "退出房间", null);
+							var dataContent = new app.DataContent(app.EXIT, chatMsg, null, null);
+							nestchatlist.evalJS("CHAT.chat('" + JSON.stringify(dataContent) + "')");
+							// 这个操作是将nest-index的webview中的消息列表置空
+							mui.fire(nestRoom, "refreshRoom");
+							// 2 进入新房间
+							var chatMsg2 = new app.ChatMsg(meInfo.id, roomId , "进入房间", null);
+							var dataContent2 = new app.DataContent(app.ENTER, chatMsg2, null, null);
+							nestchatlist.evalJS("CHAT.chat('" + JSON.stringify(dataContent2) + "')");
+							mui.fire(nestRoom, "enterRoom");
+							// 设置当前currentRoom 为该房间
+							var currentRoom = app.getRoomFromRoomListByRoomId(roomId);
+							app.setCurrentRoom(currentRoom);
+							console.log(JSON.stringify(currentRoom));
+							// 清空当前audio的歌曲
+							mui.fire(plus.webview.getWebviewById("index.html"),"clearSong");
+						}		
+	
+						// 不管是否切换房间，都先去房间的聊天页面，就是下面这行代码
+						var indexwebview = plus.webview.getWebviewById("index.html");
+						mui.fire(indexwebview, "showIndex");
+						
+									
+					});
+				}	
+			});
+		</script>
+	</body>
+
+</html>
